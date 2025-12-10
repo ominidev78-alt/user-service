@@ -1,0 +1,69 @@
+import { Router } from 'express';
+import { medDisputeController } from '../controllers/MedDisputeController.js';
+import { adminAuth } from '../middleware/adminAuth.js';
+import { userAuth } from '../middleware/userAuth.js';
+
+const router = Router();
+
+/**
+ * @openapi
+ * tags:
+ *   name: MedDisputes
+ *   description: Gestão de disputas (MED) de transações Pix.
+ */
+
+router.get('/admin/med', adminAuth, (req, res, next) => medDisputeController.list(req, res, next));
+
+router.get('/admin/med/summary', adminAuth, (req, res, next) =>
+  medDisputeController.summary(req, res, next)
+);
+
+router.get('/admin/med/:id', adminAuth, (req, res, next) =>
+  medDisputeController.detail(req, res, next)
+);
+
+router.post('/admin/med/:id/defense', adminAuth, (req, res, next) =>
+  medDisputeController.saveDefense(req, res, next)
+);
+
+router.post('/admin/med/:id/action', adminAuth, (req, res, next) =>
+  medDisputeController.action(req, res, next)
+);
+
+router.get('/admin/med/:id/attachments', adminAuth, (req, res, next) =>
+  medDisputeController.attachments(req, res, next)
+);
+
+router.get('/admin/med/:id/user', adminAuth, (req, res, next) =>
+  medDisputeController.user(req, res, next)
+);
+
+router.get('/admin/med/:id/transaction', adminAuth, (req, res, next) =>
+  medDisputeController.transaction(req, res, next)
+);
+
+router.get('/med', userAuth, (req, res, next) =>
+  medDisputeController.listMyDisputes(req, res, next)
+);
+
+router.get('/med/summary', userAuth, (req, res, next) =>
+  medDisputeController.getMySummary(req, res, next)
+);
+
+router.get('/med/:id', userAuth, (req, res, next) =>
+  medDisputeController.getMyDisputeDetail(req, res, next)
+);
+
+router.post('/med/:id/defense', userAuth, (req, res, next) =>
+  medDisputeController.saveMyDefense(req, res, next)
+);
+
+router.get('/med/:id/attachments', userAuth, (req, res, next) =>
+  medDisputeController.getMyDisputeAttachments(req, res, next)
+);
+
+router.get('/med/:id/transaction', userAuth, (req, res, next) =>
+  medDisputeController.getMyDisputeTransaction(req, res, next)
+);
+
+export default router;
