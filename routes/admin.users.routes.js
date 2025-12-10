@@ -1,6 +1,63 @@
 import { Router } from 'express'
+import axios from 'axios'
 import { userAdminController } from '../controllers/UserAdminController.js'
 
+/**
+ * Middleware REAL de autenticação de admin via AUTH-SERVICE
+ * URL: https://auth-service.omnigateway.site/api/auth/validate-admin
+ */
+async function adminAuth(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization
+
+    if (!authHeader) {
+      return res.status(401).json({
+        ok: false,
+        error: 'MissingAuthorizationHeader'
+      })
+    }
+
+    const token = authHeader.replace('Bearer ', '').trim()
+
+    if (!token) {
+      return res.status(401).json({
+        ok: false,
+        error: 'InvalidToken'
+      })
+    }
+
+    const response = await axios.get(
+      'https://auth-service.omnigateway.site/api/auth/validate-admin',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+
+    if (!response.data?.ok) {
+      return res.status(403).json({
+        ok: false,
+        error: 'Forbidden',
+        detail: 'Admin permission required'
+      })
+    }
+
+    req.admin = response.data.admin
+    next()
+
+  } catch (err) {
+    if (err.response) {
+      return res.status(err.response.status).json(err.response.data)
+    }
+
+    return res.status(500).json({
+      ok: false,
+      error: 'AdminAuthError',
+      detail: err.message
+    })
+  }
+}
 
 const router = Router()
 
