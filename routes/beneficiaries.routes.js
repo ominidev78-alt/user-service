@@ -1,14 +1,14 @@
 import { Router } from 'express'
+import { userAuth } from '../middleware/userAuth.js'
 import BeneficiaryController from '../controllers/BeneficiaryController.js'
 
 const router = Router()
 
-
-router.post('/users/:id/beneficiaries', BeneficiaryController.create)
-router.get('/users/:id/beneficiaries', BeneficiaryController.list)
-router.delete('/users/:id/beneficiaries/:beneficiaryId', BeneficiaryController.remove)
-router.put('/users/:id/beneficiaries/:beneficiaryId', BeneficiaryController.update)
-router.patch('/users/:id/beneficiaries/:beneficiaryId', BeneficiaryController.update)
+router.post('/users/:id/beneficiaries', userAuth, BeneficiaryController.create)
+router.get('/users/:id/beneficiaries', userAuth, BeneficiaryController.list)
+router.delete('/users/:id/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.remove)
+router.put('/users/:id/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.update)
+router.patch('/users/:id/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.update)
 
 
 router.post('/beneficiaries', userAuth, BeneficiaryController.create)
