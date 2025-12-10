@@ -17,7 +17,7 @@ const idParamSchema = Joi.object({
   id: Joi.number().integer().positive().required()
 })
 
-const USER_SERVICE_URL = (env.USER_SERVICE_URL || 'https://mutual-fintech-user-service.vercel.app').replace(/\/+$/, '')
+const USER_SERVICE_URL = (env.USER_SERVICE_URL || 'https:/user-service.omnigateway.site').replace(/\/+$/, '')
 
 function generateAppCredentials() {
   const appIdRandom = crypto.randomBytes(8).toString('hex')

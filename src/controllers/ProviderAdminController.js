@@ -104,7 +104,6 @@ export class ProviderAdminController {
         throw new HttpError(404, 'ProviderNotFound', { providerId })
       }
 
-      // Se está tentando alterar o código, verificar se não existe outro com o mesmo código
       if (code !== undefined) {
         if (typeof code !== 'string' || code.trim() === '') {
           throw new HttpError(400, 'ValidationError', { message: 'code deve ser uma string não vazia' })
