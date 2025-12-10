@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { MaintenanceModeModel } from '../models/MaintenanceModeModel.js'
+import { MaintenanceModeModel } from '../models/MaintenanceModel.js'
 import { HttpError } from '../core/HttpError.js'
 
 const toggleSchema = Joi.object({
