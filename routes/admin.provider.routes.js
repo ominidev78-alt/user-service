@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { providerAdminController } from '../controllers/ProviderAdminController.js'
-import { adminAuth } from '../middlewares/adminAuth.js'
+
 
 const router = Router()
 
