@@ -7,9 +7,10 @@ export const db = new Pool({
   ssl: { rejectUnauthorized: false }
 })
 
+export const pool = db
+
 export async function initDb() {
   console.log('[DB user-service] init...')
-
 
   await db.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -47,7 +48,6 @@ export async function initDb() {
   await db.query(`
     CREATE INDEX IF NOT EXISTS idx_users_external_id ON users(external_id);
   `)
-
 
   await db.query(`
     CREATE TABLE IF NOT EXISTS user_fees (
