@@ -1,6 +1,5 @@
 import Joi from 'joi'
 import { MedDisputeModel } from '../models/MedDisputeModel.js'
-import { WalletModel } from '../models/WalletModel.js'
 import { UserModel } from '../models/UserModel.js'
 import { HttpError } from '../core/HttpError.js'
 
