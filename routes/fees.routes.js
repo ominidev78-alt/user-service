@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { userFeeController } from '../controllers/UserFeeController.js'
-
+import { adminAuth } from '../middleware/adminAuth.js'
+import { userAuth } from '../middleware/userAuth.js'
 
 const router = Router()
 

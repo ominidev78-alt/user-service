@@ -1,20 +1,26 @@
 import axios from 'axios'
 
 /**
- * Middleware de autenticação do usuário via AUTH-SERVICE
+ * Middleware de autenticação de administradores via AUTH-SERVICE
  *
- * O user-service NÃO valida JWT sozinho.
- * Quem valida é o auth-service:
+ * O user-service não valida JWT diretamente.
+ * A validação de token e permissão é 100% responsabilidade do auth-service.
  *
- *  GET https://auth-service.omnigateway.site/api/auth/validate-user
+ * Endpoint chamado:
+ *   GET https://auth-service.omnigateway.site/api/auth/validate-admin
  *
- * Este middleware simplesmente:
- *  - pega o token do header
- *  - envia para o auth-service validar
- *  - recebe userId e dados do usuário.
+ * O auth-service deve retornar:
+ *   {
+ *     ok: true,
+ *     admin: {
+ *       id: number,
+ *       email: string,
+ *       role: "ADMIN"
+ *     }
+ *   }
  */
 
-export async function userAuth(req, res, next) {
+export async function adminAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization
 
@@ -34,8 +40,9 @@ export async function userAuth(req, res, next) {
       })
     }
 
+   
     const response = await axios.get(
-      'https://auth-service.omnigateway.site/api/auth/validate-user',
+      'https://auth-service.omnigateway.site/api/auth/validate-admin',
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -43,24 +50,28 @@ export async function userAuth(req, res, next) {
       }
     )
 
+
     if (!response.data?.ok) {
       return res.status(403).json({
         ok: false,
-        error: 'Forbidden'
+        error: 'Forbidden',
+        detail: 'Admin permission required'
       })
     }
 
-    req.user = response.data.user
+    
+    req.admin = response.data.admin
     next()
 
   } catch (err) {
+    
     if (err.response) {
       return res.status(err.response.status).json(err.response.data)
     }
 
     return res.status(500).json({
       ok: false,
-      error: 'UserAuthError',
+      error: 'AdminAuthError',
       detail: err.message
     })
   }
