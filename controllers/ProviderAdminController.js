@@ -1,16 +1,16 @@
-import { ProviderModel } from '../models/ProviderModel.js';
-import { HttpError } from '../core/HttpError.js';
+import { ProviderModel } from '../models/ProviderModel.js'
+import { HttpError } from '../core/HttpError.js'
 
 export class ProviderAdminController {
   async list(req, res, next) {
     try {
-      const active = req.query.active !== undefined ? req.query.active === 'true' : undefined;
-      const search = (req.query.search || '').trim() || null;
-      const limit = req.query.limit ? Number(req.query.limit) : 50;
-      const offset = req.query.offset ? Number(req.query.offset) : 0;
+      const active = req.query.active !== undefined ? req.query.active === 'true' : undefined
+      const search = (req.query.search || '').trim() || null
+      const limit = req.query.limit ? Number(req.query.limit) : 50
+      const offset = req.query.offset ? Number(req.query.offset) : 0
 
-      const providers = await ProviderModel.findAll({ active, search, limit, offset });
-      const total = await ProviderModel.count({ active, search });
+      const providers = await ProviderModel.findAll({ active, search, limit, offset })
+      const total = await ProviderModel.count({ active, search })
 
       return res.json({
         ok: true,
@@ -19,193 +19,183 @@ export class ProviderAdminController {
           total,
           limit,
           offset,
-          hasMore: offset + providers.length < total,
-        },
-      });
+          hasMore: offset + providers.length < total
+        }
+      })
     } catch (err) {
-      return next(err);
+      return next(err)
     }
   }
 
   async detail(req, res, next) {
     try {
-      const idParam = req.params.id;
-      const providerId = Number(idParam);
+      const idParam = req.params.id
+      const providerId = Number(idParam)
 
       if (!providerId || Number.isNaN(providerId)) {
-        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' });
+        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' })
       }
 
-      const provider = await ProviderModel.findById(providerId);
+      const provider = await ProviderModel.findById(providerId)
 
       if (!provider) {
-        throw new HttpError(404, 'ProviderNotFound', { providerId });
+        throw new HttpError(404, 'ProviderNotFound', { providerId })
       }
 
       return res.json({
         ok: true,
-        data: provider,
-      });
+        data: provider
+      })
     } catch (err) {
-      return next(err);
+      return next(err)
     }
   }
 
   async create(req, res, next) {
     try {
-      const { code, name, base_url, baseUrl, active } = req.body || {};
+      const { code, name, base_url, baseUrl, active } = req.body || {}
 
       if (!code || typeof code !== 'string' || code.trim() === '') {
-        throw new HttpError(400, 'ValidationError', {
-          message: 'code é obrigatório e deve ser uma string não vazia',
-        });
+        throw new HttpError(400, 'ValidationError', { message: 'code é obrigatório e deve ser uma string não vazia' })
       }
 
       if (!name || typeof name !== 'string' || name.trim() === '') {
-        throw new HttpError(400, 'ValidationError', {
-          message: 'name é obrigatório e deve ser uma string não vazia',
-        });
+        throw new HttpError(400, 'ValidationError', { message: 'name é obrigatório e deve ser uma string não vazia' })
       }
 
       if (active !== undefined && typeof active !== 'boolean') {
-        throw new HttpError(400, 'ValidationError', { message: 'active deve ser um boolean' });
+        throw new HttpError(400, 'ValidationError', { message: 'active deve ser um boolean' })
       }
 
-      const existing = await ProviderModel.findByCode(code.trim().toUpperCase());
+      // Verificar se já existe um provider com o mesmo código
+      const existing = await ProviderModel.findByCode(code.trim().toUpperCase())
       if (existing) {
-        throw new HttpError(409, 'ProviderCodeExists', {
-          message: 'Já existe um provider com este código',
-        });
+        throw new HttpError(409, 'ProviderCodeExists', { message: 'Já existe um provider com este código' })
       }
 
       const provider = await ProviderModel.create({
         code: code.trim().toUpperCase(),
         name: name.trim(),
         baseUrl: base_url || baseUrl || null,
-        active: active !== undefined ? active : true,
-      });
+        active: active !== undefined ? active : true
+      })
 
       return res.status(201).json({
         ok: true,
-        data: provider,
-      });
+        data: provider
+      })
     } catch (err) {
-      return next(err);
+      return next(err)
     }
   }
 
   async update(req, res, next) {
     try {
-      const idParam = req.params.id;
-      const providerId = Number(idParam);
+      const idParam = req.params.id
+      const providerId = Number(idParam)
 
       if (!providerId || Number.isNaN(providerId)) {
-        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' });
+        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' })
       }
 
-      const { code, name, base_url, baseUrl, active } = req.body || {};
+      const { code, name, base_url, baseUrl, active } = req.body || {}
 
-      const existing = await ProviderModel.findById(providerId);
+      const existing = await ProviderModel.findById(providerId)
       if (!existing) {
-        throw new HttpError(404, 'ProviderNotFound', { providerId });
+        throw new HttpError(404, 'ProviderNotFound', { providerId })
       }
 
+      // Se está tentando alterar o código, verificar se não existe outro com o mesmo código
       if (code !== undefined) {
         if (typeof code !== 'string' || code.trim() === '') {
-          throw new HttpError(400, 'ValidationError', {
-            message: 'code deve ser uma string não vazia',
-          });
+          throw new HttpError(400, 'ValidationError', { message: 'code deve ser uma string não vazia' })
         }
 
-        const codeUpper = code.trim().toUpperCase();
-        const existingByCode = await ProviderModel.findByCode(codeUpper);
+        const codeUpper = code.trim().toUpperCase()
+        const existingByCode = await ProviderModel.findByCode(codeUpper)
         if (existingByCode && existingByCode.id !== providerId) {
-          throw new HttpError(409, 'ProviderCodeExists', {
-            message: 'Já existe outro provider com este código',
-          });
+          throw new HttpError(409, 'ProviderCodeExists', { message: 'Já existe outro provider com este código' })
         }
       }
 
       if (active !== undefined && typeof active !== 'boolean') {
-        throw new HttpError(400, 'ValidationError', { message: 'active deve ser um boolean' });
+        throw new HttpError(400, 'ValidationError', { message: 'active deve ser um boolean' })
       }
 
-      const updateData = {};
-      if (code !== undefined) updateData.code = code.trim().toUpperCase();
-      if (name !== undefined) updateData.name = name.trim();
-      if (base_url !== undefined || baseUrl !== undefined)
-        updateData.baseUrl = base_url || baseUrl || null;
-      if (active !== undefined) updateData.active = active;
+      const updateData = {}
+      if (code !== undefined) updateData.code = code.trim().toUpperCase()
+      if (name !== undefined) updateData.name = name.trim()
+      if (base_url !== undefined || baseUrl !== undefined) updateData.baseUrl = base_url || baseUrl || null
+      if (active !== undefined) updateData.active = active
 
-      const updated = await ProviderModel.update(providerId, updateData);
+      const updated = await ProviderModel.update(providerId, updateData)
 
       return res.json({
         ok: true,
-        data: updated,
-      });
+        data: updated
+      })
     } catch (err) {
-      return next(err);
+      return next(err)
     }
   }
 
   async updateStatus(req, res, next) {
     try {
-      const idParam = req.params.id;
-      const providerId = Number(idParam);
+      const idParam = req.params.id
+      const providerId = Number(idParam)
 
       if (!providerId || Number.isNaN(providerId)) {
-        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' });
+        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' })
       }
 
-      const { active } = req.body || {};
+      const { active } = req.body || {}
 
       if (typeof active !== 'boolean') {
-        throw new HttpError(400, 'ValidationError', {
-          message: 'active é obrigatório e deve ser um boolean',
-        });
+        throw new HttpError(400, 'ValidationError', { message: 'active é obrigatório e deve ser um boolean' })
       }
 
-      const existing = await ProviderModel.findById(providerId);
+      const existing = await ProviderModel.findById(providerId)
       if (!existing) {
-        throw new HttpError(404, 'ProviderNotFound', { providerId });
+        throw new HttpError(404, 'ProviderNotFound', { providerId })
       }
 
-      const updated = await ProviderModel.updateStatus(providerId, active);
+      const updated = await ProviderModel.updateStatus(providerId, active)
 
       return res.json({
         ok: true,
-        data: updated,
-      });
+        data: updated
+      })
     } catch (err) {
-      return next(err);
+      return next(err)
     }
   }
 
   async delete(req, res, next) {
     try {
-      const idParam = req.params.id;
-      const providerId = Number(idParam);
+      const idParam = req.params.id
+      const providerId = Number(idParam)
 
       if (!providerId || Number.isNaN(providerId)) {
-        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' });
+        throw new HttpError(400, 'ValidationError', { message: 'providerId inválido' })
       }
 
-      const existing = await ProviderModel.findById(providerId);
+      const existing = await ProviderModel.findById(providerId)
       if (!existing) {
-        throw new HttpError(404, 'ProviderNotFound', { providerId });
+        throw new HttpError(404, 'ProviderNotFound', { providerId })
       }
 
-      const deleted = await ProviderModel.delete(providerId);
+      const deleted = await ProviderModel.delete(providerId)
 
       return res.json({
         ok: true,
         data: deleted,
-        message: 'Provider removido com sucesso',
-      });
+        message: 'Provider removido com sucesso'
+      })
     } catch (err) {
-      return next(err);
+      return next(err)
     }
   }
 }
 
-export const providerAdminController = new ProviderAdminController();
+export const providerAdminController = new ProviderAdminController()
+

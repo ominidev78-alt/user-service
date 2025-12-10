@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { userController } from '../controllers/UserController.js';
+import { Router } from 'express'
+import { userController } from '../controllers/UserController.js'
 
-const router = Router();
+const router = Router()
 
 /**
  * @openapi
@@ -53,8 +53,8 @@ const router = Router();
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.post('/users', (req, res, next) => userController.create(req, res, next));
-router.get('/users', (req, res, next) => userController.list(req, res, next));
+router.post('/users', (req, res, next) => userController.create(req, res, next))
+router.get('/users', (req, res, next) => userController.list(req, res, next))
 
 /**
  * @openapi
@@ -93,7 +93,7 @@ router.get('/users', (req, res, next) => userController.list(req, res, next));
  */
 router.post('/users/create-with-deposit', (req, res, next) =>
   userController.createWithDeposit(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -120,7 +120,7 @@ router.post('/users/create-with-deposit', (req, res, next) =>
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.get('/users/:id', (req, res, next) => userController.get(req, res, next));
+router.get('/users/:id', (req, res, next) => userController.get(req, res, next))
 
 /**
  * @openapi
@@ -150,7 +150,7 @@ router.get('/users/:id', (req, res, next) => userController.get(req, res, next))
  */
 router.get('/users/:id/credentials', (req, res, next) =>
   userController.getCredentials(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -180,7 +180,7 @@ router.get('/users/:id/credentials', (req, res, next) =>
  */
 router.post('/users/:id/credentials/rotate', (req, res, next) =>
   userController.rotateCredentials(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -205,4 +205,4 @@ router.post('/users/:id/credentials/rotate', (req, res, next) =>
  *           $ref: '#/components/schemas/UserCredentials'
  */
 
-export default router;
+export default router

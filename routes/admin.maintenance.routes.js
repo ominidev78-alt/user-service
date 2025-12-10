@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import { maintenanceController } from '../controllers/MaintenanceController.js';
-import { adminAuth } from '../middleware/adminAuth.js';
+import { Router } from 'express'
+import { maintenanceController } from '../controllers/MaintenanceController.js'
+import { adminAuth } from '../middlewares/adminAuth.js'
 
-const router = Router();
+const router = Router()
 
 /**
  * @openapi
@@ -27,9 +27,11 @@ const router = Router();
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.get('/admin/settings/maintenance', adminAuth, (req, res, next) =>
-  maintenanceController.adminGetStatus(req, res, next)
-);
+router.get(
+  '/admin/settings/maintenance',
+  adminAuth,
+  (req, res, next) => maintenanceController.adminGetStatus(req, res, next)
+)
 
 /**
  * @openapi
@@ -64,8 +66,10 @@ router.get('/admin/settings/maintenance', adminAuth, (req, res, next) =>
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.patch('/admin/settings/maintenance', adminAuth, (req, res, next) =>
-  maintenanceController.adminToggle(req, res, next)
-);
+router.patch(
+  '/admin/settings/maintenance',
+  adminAuth,
+  (req, res, next) => maintenanceController.adminToggle(req, res, next)
+)
 
-export default router;
+export default router

@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import { providerAdminController } from '../controllers/ProviderAdminController.js';
-import { adminAuth } from '../middleware/adminAuth.js';
+import { Router } from 'express'
+import { providerAdminController } from '../controllers/ProviderAdminController.js'
+import { adminAuth } from '../middlewares/adminAuth.js'
 
-const router = Router();
+const router = Router()
 
 /**
  * @openapi
@@ -47,7 +47,7 @@ const router = Router();
  */
 router.get('/admin/providers', adminAuth, (req, res, next) =>
   providerAdminController.list(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -70,7 +70,7 @@ router.get('/admin/providers', adminAuth, (req, res, next) =>
  */
 router.get('/admin/providers/:id', adminAuth, (req, res, next) =>
   providerAdminController.detail(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -112,7 +112,7 @@ router.get('/admin/providers/:id', adminAuth, (req, res, next) =>
  */
 router.post('/admin/providers', adminAuth, (req, res, next) =>
   providerAdminController.create(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -154,7 +154,7 @@ router.post('/admin/providers', adminAuth, (req, res, next) =>
  */
 router.put('/admin/providers/:id', adminAuth, (req, res, next) =>
   providerAdminController.update(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -191,7 +191,7 @@ router.put('/admin/providers/:id', adminAuth, (req, res, next) =>
  */
 router.patch('/admin/providers/:id/status', adminAuth, (req, res, next) =>
   providerAdminController.updateStatus(req, res, next)
-);
+)
 
 /**
  * @openapi
@@ -214,6 +214,6 @@ router.patch('/admin/providers/:id/status', adminAuth, (req, res, next) =>
  */
 router.delete('/admin/providers/:id', adminAuth, (req, res, next) =>
   providerAdminController.delete(req, res, next)
-);
+)
 
-export default router;
+export default router

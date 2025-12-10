@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { operatorController } from '../controllers/OperatorController.js';
+import { Router } from 'express'
+import { operatorController } from '../controllers/OperatorController.js'
 
-const router = Router();
+const router = Router()
 
 /**
  * @openapi
@@ -44,6 +44,8 @@ const router = Router();
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.post('/operators', (req, res, next) => operatorController.register(req, res, next));
+router.post('/operators', (req, res, next) =>
+  operatorController.register(req, res, next)
+)
 
-export default router;
+export default router

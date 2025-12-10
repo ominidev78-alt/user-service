@@ -1,7 +1,21 @@
-import app from './app.js';
-import { env } from './config/env.js';
-import './config/db.js';
+import { app } from './app.js'
+import { env } from './config/env.js'
+import { initDb } from './config/db.js'
 
-app.listen(env.PORT, '0.0.0.0', () => {
-  console.log('USER-SERVICE rodando na porta', env.PORT);
-});
+async function start() {
+    try {
+        await initDb()
+
+        const PORT = process.env.PORT || 3000
+
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`user-service rodando na porta ${PORT}`)
+        })
+
+    } catch (err) {
+        console.error('Erro ao iniciar user-service:', err)
+        process.exit(1)
+    }
+}
+
+start()

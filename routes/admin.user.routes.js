@@ -1,64 +1,8 @@
-import { Router } from 'express';
-import axios from 'axios';
-import { userAdminController } from '../controllers/UserAdminController.js';
+import { Router } from 'express'
+import { userAdminController } from '../controllers/UserAdminController.js'
+import { adminAuth } from '../middlewares/adminAuth.js'
 
-/**
- * Middleware REAL de autenticação de admin via AUTH-SERVICE
- * URL: https://auth-service.omnigateway.site/api/auth/validate-admin
- */
-async function adminAuth(req, res, next) {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      return res.status(401).json({
-        ok: false,
-        error: 'MissingAuthorizationHeader',
-      });
-    }
-
-    const token = authHeader.replace('Bearer ', '').trim();
-
-    if (!token) {
-      return res.status(401).json({
-        ok: false,
-        error: 'InvalidToken',
-      });
-    }
-
-    const response = await axios.get(
-      'https://auth-service.omnigateway.site/api/auth/validate-admin',
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!response.data?.ok) {
-      return res.status(403).json({
-        ok: false,
-        error: 'Forbidden',
-        detail: 'Admin permission required',
-      });
-    }
-
-    req.admin = response.data.admin;
-    next();
-  } catch (err) {
-    if (err.response) {
-      return res.status(err.response.status).json(err.response.data);
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'AdminAuthError',
-      detail: err.message,
-    });
-  }
-}
-
-const router = Router();
+const router = Router()
 
 /**
  * @openapi
@@ -96,7 +40,11 @@ const router = Router();
  *       403:
  *         description: Não permitido
  */
-router.get('/admin/users', adminAuth, (req, res, next) => userAdminController.list(req, res, next));
+router.get(
+  '/admin/users',
+  adminAuth,
+  (req, res, next) => userAdminController.list(req, res, next)
+)
 
 /**
  * @openapi
@@ -117,9 +65,11 @@ router.get('/admin/users', adminAuth, (req, res, next) => userAdminController.li
  *       404:
  *         description: Usuário não encontrado
  */
-router.get('/admin/users/:id', adminAuth, (req, res, next) =>
-  userAdminController.detail(req, res, next)
-);
+router.get(
+  '/admin/users/:id',
+  adminAuth,
+  (req, res, next) => userAdminController.detail(req, res, next)
+)
 
 /**
  * @openapi
@@ -152,9 +102,11 @@ router.get('/admin/users/:id', adminAuth, (req, res, next) =>
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch('/admin/users/:id/doc-status', adminAuth, (req, res, next) =>
-  userAdminController.updateDocStatus(req, res, next)
-);
+router.patch(
+  '/admin/users/:id/doc-status',
+  adminAuth,
+  (req, res, next) => userAdminController.updateDocStatus(req, res, next)
+)
 
 /**
  * @openapi
@@ -184,9 +136,11 @@ router.patch('/admin/users/:id/doc-status', adminAuth, (req, res, next) =>
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch('/admin/users/:id/treasury-flag', adminAuth, (req, res, next) =>
-  userAdminController.setTreasuryFlag(req, res, next)
-);
+router.patch(
+  '/admin/users/:id/treasury-flag',
+  adminAuth,
+  (req, res, next) => userAdminController.setTreasuryFlag(req, res, next)
+)
 
 /**
  * @openapi
@@ -220,9 +174,11 @@ router.patch('/admin/users/:id/treasury-flag', adminAuth, (req, res, next) =>
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch('/admin/users/:id/provider', adminAuth, (req, res, next) =>
-  userAdminController.setProvider(req, res, next)
-);
+router.patch(
+  '/admin/users/:id/provider',
+  adminAuth,
+  (req, res, next) => userAdminController.setProvider(req, res, next)
+)
 
 /**
  * @openapi
@@ -256,8 +212,10 @@ router.patch('/admin/users/:id/provider', adminAuth, (req, res, next) =>
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch('/admin/users/:id/config', adminAuth, (req, res, next) =>
-  userAdminController.updateConfig(req, res, next)
-);
+router.patch(
+  '/admin/users/:id/config',
+  adminAuth,
+  (req, res, next) => userAdminController.updateConfig(req, res, next)
+)
 
-export default router;
+export default router

@@ -1,45 +1,116 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import hpp from 'hpp';
-import morgan from 'morgan';
+import express from 'express'
+import morgan from 'morgan'
+import helmet from 'helmet'
+import hpp from 'hpp'
+import cors from 'cors'
+import { v4 as uuid } from 'uuid'
+import routes from './routes/index.js'
+import { notFoundHandler, globalErrorHandler } from './core/errorHandler.js'
+import { env } from './config/env.js'
 
-import usersRoutes from './routes/users.routes.js';
-import adminUsersRoutes from './routes/admin.users.routes.js';
-import beneficiariesRoutes from './routes/beneficiaries.routes.js';
-import feesRoutes from './routes/fees.routes.js';
-import medRoutes from './routes/med.routes.js';
-import operatorRoutes from './routes/operator.routes.js';
-import providerRoutes from './routes/admin.provider.routes.js';
-import publicMaintenanceRoutes from './routes/public.maintenance.routes.js';
-import adminMaintenanceRoutes from './routes/admin.maintenance.routes.js';
-import healthRoutes from './routes/health.routes.js';
-import internalRoutes from './routes/internal.routes.js';
+const app = express()
 
-import { notFoundHandler, globalErrorHandler } from './core/errorHandler.js';
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://api.ominigateway.com.br',
+    'https://api.ominigateway.com.br',
+    'https://ominigateway.com.br',
+    'https://admin.ominigateway.com.br',
+    'https://payg2a.online',
+    'https://mutual-fintech-front-end-paas.vercel.app'
+]
 
-const app = express();
+app.use((req, res, next) => {
+    const origin = req.headers.origin
+    let isAllowed = false
 
-app.use(cors());
-app.use(express.json());
-app.use(morgan('dev'));
-app.use(helmet());
-app.use(hpp());
+    if (!origin) {
+        isAllowed = true
+    } else {
+        const normalizedOrigin = origin.replace(/\/$/, '')
+        isAllowed = allowedOrigins.some(allowed => {
+            const normalizedAllowed = allowed.replace(/\/$/, '')
+            return normalizedOrigin === normalizedAllowed || origin === allowed
+        })
+    }
 
-app.use('/api', usersRoutes);
-app.use('/api', adminUsersRoutes);
-app.use('/api', beneficiariesRoutes);
-app.use('/api', feesRoutes);
-app.use('/api', medRoutes);
-app.use('/api', operatorRoutes);
-app.use('/api', providerRoutes);
+    if (isAllowed) {
+        if (origin) {
+            res.setHeader('Access-Control-Allow-Origin', origin)
+            res.setHeader('Access-Control-Allow-Credentials', 'true')
+        } else {
+            res.setHeader('Access-Control-Allow-Origin', '*')
+        }
 
-app.use('/api', publicMaintenanceRoutes);
-app.use('/api', adminMaintenanceRoutes);
-app.use('/api', healthRoutes);
-app.use('/api', internalRoutes);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD')
+        res.setHeader(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization, app_id, app_secret, client_id, client_secret, x-api-key, x-user-id, x-app-id, Accept, Origin, X-Requested-With'
+        )
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Type, Authorization')
+        res.setHeader('Access-Control-Max-Age', '86400')
 
-app.use(notFoundHandler);
-app.use(globalErrorHandler);
+        if (req.method === 'OPTIONS') {
+            return res.status(204).end()
+        }
+    }
 
-export default app;
+    next()
+})
+
+app.use(cors({
+    origin(origin, callback) {
+        if (!origin) return callback(null, true)
+        const normalizedOrigin = origin.replace(/\/$/, '')
+        const isAllowed = allowedOrigins.some(allowed => {
+            const normalizedAllowed = allowed.replace(/\/$/, '')
+            return normalizedOrigin === normalizedAllowed || origin === allowed
+        })
+        if (isAllowed) callback(null, true)
+        else callback(new Error('Not allowed by CORS'))
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'app_id',
+        'app_secret',
+        'client_id',
+        'client_secret',
+        'x-api-key',
+        'x-user-id',
+        'x-app-id',
+        'Accept',
+        'Origin',
+        'X-Requested-With'
+    ],
+    exposedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 204
+}))
+
+if (env.NODE_ENV !== 'production') {
+    app.use(morgan('dev'))
+} else {
+    app.use(morgan('combined'))
+}
+
+app.use(helmet())
+app.use(hpp())
+app.use(express.json({ limit: '2mb', type: ['application/json', 'application/*+json'] }))
+app.use(express.urlencoded({ extended: true, limit: '2mb' }))
+
+app.use((req, res, next) => {
+    req.id = req.headers['x-request-id'] || uuid()
+    res.setHeader('X-Request-Id', req.id)
+    next()
+})
+
+app.use(routes)
+
+app.use(notFoundHandler)
+app.use(globalErrorHandler)
+
+export { app }
+export default app
