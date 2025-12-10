@@ -2,7 +2,6 @@ import Joi from 'joi'
 import crypto from 'crypto'
 import axios from 'axios'
 import { UserModel } from '../models/UserModel.js'
-import { WalletModel } from '../models/WalletModel.js'
 import { HttpError } from '../core/HttpError.js'
 import { env } from '../config/env.js'
 
