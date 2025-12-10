@@ -11,7 +11,7 @@ import axios from 'axios'
  * Este middleware simplesmente:
  *  - pega o token do header
  *  - envia para o auth-service validar
- *  - recebe userId e dados do usuário
+ *  - recebe userId e dados do usuário.
  */
 
 export async function userAuth(req, res, next) {
