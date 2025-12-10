@@ -1,19 +1,20 @@
 import axios from 'axios'
 
 /**
- * Middleware de autenticação de administradores via AUTH-SERVICE
+ * Middleware de autenticação do usuário via AUTH-SERVICE
  *
- * Este middleware valida o token JWT do admin chamando o endpoint:
- *   GET https://auth-service.omnigateway.site/api/auth/validate-admin
+ * O user-service NÃO valida JWT sozinho.
+ * Quem valida é o auth-service:
  *
- * O AUTH-SERVICE é o responsável pela validação das permissões,
- * verificando:
- *   - Token válido
- *   - Token não expirado
- *   - Role = ADMIN
+ *  GET https://auth-service.omnigateway.site/api/auth/validate-user
+ *
+ * Este middleware simplesmente:
+ *  - pega o token do header
+ *  - envia para o auth-service validar
+ *  - recebe userId e dados do usuário
  */
 
-export async function adminAuth(req, res, next) {
+export async function userAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization
 
@@ -33,9 +34,8 @@ export async function adminAuth(req, res, next) {
       })
     }
 
-
     const response = await axios.get(
-      'https://auth-service.omnigateway.site/api/auth/validate-admin',
+      'https://auth-service.omnigateway.site/api/auth/validate-user',
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -46,26 +46,21 @@ export async function adminAuth(req, res, next) {
     if (!response.data?.ok) {
       return res.status(403).json({
         ok: false,
-        error: 'Forbidden',
-        detail: 'Admin permission required'
+        error: 'Forbidden'
       })
     }
 
-
-    req.admin = response.data.admin
+    req.user = response.data.user
     next()
 
   } catch (err) {
-   
     if (err.response) {
       return res.status(err.response.status).json(err.response.data)
     }
 
-    console.error('[adminAuth] Unexpected error:', err.message)
-
     return res.status(500).json({
       ok: false,
-      error: 'AdminAuthError',
+      error: 'UserAuthError',
       detail: err.message
     })
   }
