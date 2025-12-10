@@ -2,7 +2,6 @@ import Joi from 'joi'
 import axios from 'axios'
 import { HttpError } from '../core/HttpError.js'
 import { UserModel } from '../models/UserModel.js'
-import { WalletModel } from '../models/WalletModel.js'
 
 const CNPJ_API = "https://brasilapi.com.br/api/cnpj/v1"
 
