@@ -48,7 +48,7 @@ export async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_users_external_id ON users(external_id);
   `)
 
- 
+
   await db.query(`
     CREATE TABLE IF NOT EXISTS user_fees (
       user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
@@ -68,7 +68,6 @@ export async function initDb() {
     ON user_fees(user_id);
   `)
 
- 
   await db.query(`
     CREATE TABLE IF NOT EXISTS providers (
       id SERIAL PRIMARY KEY,
