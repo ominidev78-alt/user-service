@@ -21,9 +21,8 @@ router.use('/api', operatorRoutes)
 
 
 router.use('/api', medRoutes)
-router.use('/api', adminTreasuryRoutes)
+
 router.use('/api', adminUserRoutes)
-router.use('/api', adminWalletRoutes)
 router.use('/api', adminMaintenanceRoutes)
 router.use('/api', adminProviderRoutes)
 router.use('/api', publicMaintenanceRoutes)
