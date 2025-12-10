@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { userAuth } from '../middleware/userAuth.js'
 
 /**
  * Middleware de autenticação do usuário via AUTH-SERVICE

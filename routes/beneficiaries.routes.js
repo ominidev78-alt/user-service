@@ -10,13 +10,11 @@ router.delete('/users/:id/beneficiaries/:beneficiaryId', userAuth, BeneficiaryCo
 router.put('/users/:id/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.update)
 router.patch('/users/:id/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.update)
 
-
 router.post('/beneficiaries', userAuth, BeneficiaryController.create)
 router.get('/beneficiaries', userAuth, BeneficiaryController.list)
 router.delete('/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.remove)
 router.put('/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.update)
 router.patch('/beneficiaries/:beneficiaryId', userAuth, BeneficiaryController.update)
-
 
 router.post('/beneficiaries-public', BeneficiaryController.create)
 router.get('/beneficiaries-public', BeneficiaryController.list)
