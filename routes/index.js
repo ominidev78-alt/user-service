@@ -8,9 +8,11 @@ import adminProviderRoutes from './admin.provider.routes.js'
 import publicMaintenanceRoutes from './public.maintenance.routes.js'
 import adminMaintenanceRoutes from './admin.maintenance.routes.js'
 import healthRoutes from './health.routes.js'
+import internalRoutes from './internal.routes.js'
 
 const router = Router()
 
+router.use('/api', internalRoutes)
 router.use('/api', userRoutes)
 router.use('/api', adminUserRoutes)
 router.use('/api', beneficiariesRoutes)
