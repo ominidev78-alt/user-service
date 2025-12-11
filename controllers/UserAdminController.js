@@ -1,17 +1,17 @@
-import crypto from "crypto";
-import { pool } from "../config/db.js";
-import { UserModel } from "../models/UserModel.js";
-import { ProviderModel } from "../models/ProviderModel.js";
-import { HttpError } from "../core/HttpError.js";
+import crypto from 'crypto';
+import { pool } from '../config/db.js';
+import { UserModel } from '../models/UserModel.js';
+import { ProviderModel } from '../models/ProviderModel.js';
+import { HttpError } from '../core/HttpError.js';
 
 function generateRandomString(size = 32) {
-  return crypto.randomBytes(size).toString("hex");
+  return crypto.randomBytes(size).toString('hex');
 }
 
 export class UserAdminController {
   async list(req, res, next) {
     try {
-      const search = (req.query.search || "").trim();
+      const search = (req.query.search || '').trim();
       const limitRaw = req.query.limit;
       const offsetRaw = req.query.offset;
 
@@ -26,7 +26,7 @@ export class UserAdminController {
       }
 
       const params = [];
-      let where = "1=1";
+      let where = '1=1';
 
       if (search) {
         params.push(`%${search}%`);
@@ -86,8 +86,8 @@ export class UserAdminController {
       const userId = Number(idParam);
 
       if (!userId || Number.isNaN(userId)) {
-        throw new HttpError(400, "ValidationError", {
-          message: "userId inválido",
+        throw new HttpError(400, 'ValidationError', {
+          message: 'userId inválido',
         });
       }
 
@@ -126,7 +126,7 @@ export class UserAdminController {
 
       const user = rows[0];
       if (!user) {
-        throw new HttpError(404, "UserNotFound", { userId });
+        throw new HttpError(404, 'UserNotFound', { userId });
       }
 
       return res.json({
@@ -143,22 +143,22 @@ export class UserAdminController {
       const userId = Number(idParam);
 
       if (!userId || Number.isNaN(userId)) {
-        throw new HttpError(400, "ValidationError", {
-          message: "userId inválido",
+        throw new HttpError(400, 'ValidationError', {
+          message: 'userId inválido',
         });
       }
 
       const { isTreasury } = req.body || {};
 
-      if (typeof isTreasury !== "boolean") {
-        throw new HttpError(400, "ValidationError", {
-          message: "isTreasury deve ser boolean",
+      if (typeof isTreasury !== 'boolean') {
+        throw new HttpError(400, 'ValidationError', {
+          message: 'isTreasury deve ser boolean',
         });
       }
 
       const exists = await UserModel.findById(userId);
       if (!exists) {
-        throw new HttpError(404, "UserNotFound", { userId });
+        throw new HttpError(404, 'UserNotFound', { userId });
       }
 
       const updated = await UserModel.setTreasuryFlag(userId, isTreasury);
@@ -179,16 +179,16 @@ export class UserAdminController {
       const userId = Number(idParam);
 
       if (!userId || Number.isNaN(userId)) {
-        throw new HttpError(400, "ValidationError", {
-          message: "userId inválido",
+        throw new HttpError(400, 'ValidationError', {
+          message: 'userId inválido',
         });
       }
 
       const { status, notes } = req.body || {};
 
       if (!status) {
-        throw new HttpError(400, "ValidationError", {
-          message: "status é obrigatório",
+        throw new HttpError(400, 'ValidationError', {
+          message: 'status é obrigatório',
         });
       }
 
@@ -198,19 +198,16 @@ export class UserAdminController {
       });
 
       if (!updated || !updated.id) {
-        throw new HttpError(404, "UserNotFound", { userId });
+        throw new HttpError(404, 'UserNotFound', { userId });
       }
 
       let appId = updated.app_id || null;
       let appSecret = null;
 
-      if (status === "APPROVED" && !updated.app_id) {
+      if (status === 'APPROVED' && !updated.app_id) {
         const newAppId = generateRandomString(16);
         const newAppSecret = generateRandomString(32);
-        const appSecretHash = crypto
-          .createHash("sha256")
-          .update(newAppSecret)
-          .digest("hex");
+        const appSecretHash = crypto.createHash('sha256').update(newAppSecret).digest('hex');
 
         const withCreds = await UserModel.updateCredentials(userId, {
           appId: newAppId,
@@ -246,42 +243,38 @@ export class UserAdminController {
       const userId = Number(idParam);
 
       if (!userId || Number.isNaN(userId)) {
-        throw new HttpError(400, "ValidationError", {
-          message: "userId inválido",
+        throw new HttpError(400, 'ValidationError', {
+          message: 'userId inválido',
         });
       }
 
       const { provider } = req.body || {};
 
       // provider pode ser null para remover o provider do usuário
-      if (
-        provider !== null &&
-        provider !== undefined &&
-        typeof provider !== "string"
-      ) {
-        throw new HttpError(400, "ValidationError", {
-          message: "provider deve ser uma string ou null",
+      if (provider !== null && provider !== undefined && typeof provider !== 'string') {
+        throw new HttpError(400, 'ValidationError', {
+          message: 'provider deve ser uma string ou null',
         });
       }
 
       const exists = await UserModel.findById(userId);
       if (!exists) {
-        throw new HttpError(404, "UserNotFound", { userId });
+        throw new HttpError(404, 'UserNotFound', { userId });
       }
 
       // Se um provider foi informado, validar se ele existe e está ativo
-      if (provider && provider.trim() !== "") {
+      if (provider && provider.trim() !== '') {
         const providerCode = provider.trim().toUpperCase();
         const providerExists = await ProviderModel.findByCode(providerCode);
 
         if (!providerExists) {
-          throw new HttpError(404, "ProviderNotFound", {
+          throw new HttpError(404, 'ProviderNotFound', {
             message: `Provider com código '${providerCode}' não encontrado`,
           });
         }
 
         if (!providerExists.active) {
-          throw new HttpError(400, "ProviderInactive", {
+          throw new HttpError(400, 'ProviderInactive', {
             message: `Provider '${providerCode}' está inativo`,
           });
         }
@@ -315,8 +308,8 @@ export class UserAdminController {
       const userId = Number(idParam);
 
       if (!userId || Number.isNaN(userId)) {
-        throw new HttpError(400, "ValidationError", {
-          message: "userId inválido",
+        throw new HttpError(400, 'ValidationError', {
+          message: 'userId inválido',
         });
       }
 
@@ -327,37 +320,45 @@ export class UserAdminController {
         try {
           new URL(webhook_url);
         } catch (e) {
-          throw new HttpError(400, "ValidationError", {
-            message: "webhook_url deve ser uma URL válida",
+          throw new HttpError(400, 'ValidationError', {
+            message: 'webhook_url deve ser uma URL válida',
           });
         }
       }
 
       // Validar webhook_url_pix_in se fornecido
-      if (webhook_url_pix_in !== null && webhook_url_pix_in !== undefined && webhook_url_pix_in !== '') {
+      if (
+        webhook_url_pix_in !== null &&
+        webhook_url_pix_in !== undefined &&
+        webhook_url_pix_in !== ''
+      ) {
         try {
           new URL(webhook_url_pix_in);
         } catch (e) {
-          throw new HttpError(400, "ValidationError", {
-            message: "webhook_url_pix_in deve ser uma URL válida",
+          throw new HttpError(400, 'ValidationError', {
+            message: 'webhook_url_pix_in deve ser uma URL válida',
           });
         }
       }
 
       // Validar webhook_url_pix_out se fornecido
-      if (webhook_url_pix_out !== null && webhook_url_pix_out !== undefined && webhook_url_pix_out !== '') {
+      if (
+        webhook_url_pix_out !== null &&
+        webhook_url_pix_out !== undefined &&
+        webhook_url_pix_out !== ''
+      ) {
         try {
           new URL(webhook_url_pix_out);
         } catch (e) {
-          throw new HttpError(400, "ValidationError", {
-            message: "webhook_url_pix_out deve ser uma URL válida",
+          throw new HttpError(400, 'ValidationError', {
+            message: 'webhook_url_pix_out deve ser uma URL válida',
           });
         }
       }
 
       const exists = await UserModel.findById(userId);
       if (!exists) {
-        throw new HttpError(404, "UserNotFound", { userId });
+        throw new HttpError(404, 'UserNotFound', { userId });
       }
 
       const updated = await UserModel.updateConfig(userId, {

@@ -1,8 +1,8 @@
-import { Router } from 'express'
-import { userAdminController } from '../controllers/UserAdminController.js'
-import { adminAuth } from '../middlewares/adminAuth.js'
+import { Router } from 'express';
+import { userAdminController } from '../controllers/UserAdminController.js';
+import { adminAuth } from '../middlewares/adminAuth.js';
 
-const router = Router()
+const router = Router();
 
 /**
  * @openapi
@@ -40,11 +40,7 @@ const router = Router()
  *       403:
  *         description: Não permitido
  */
-router.get(
-  '/admin/users',
-  adminAuth,
-  (req, res, next) => userAdminController.list(req, res, next)
-)
+router.get('/admin/users', adminAuth, (req, res, next) => userAdminController.list(req, res, next));
 
 /**
  * @openapi
@@ -65,11 +61,9 @@ router.get(
  *       404:
  *         description: Usuário não encontrado
  */
-router.get(
-  '/admin/users/:id',
-  adminAuth,
-  (req, res, next) => userAdminController.detail(req, res, next)
-)
+router.get('/admin/users/:id', adminAuth, (req, res, next) =>
+  userAdminController.detail(req, res, next)
+);
 
 /**
  * @openapi
@@ -102,11 +96,9 @@ router.get(
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch(
-  '/admin/users/:id/doc-status',
-  adminAuth,
-  (req, res, next) => userAdminController.updateDocStatus(req, res, next)
-)
+router.patch('/admin/users/:id/doc-status', adminAuth, (req, res, next) =>
+  userAdminController.updateDocStatus(req, res, next)
+);
 
 /**
  * @openapi
@@ -136,11 +128,9 @@ router.patch(
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch(
-  '/admin/users/:id/treasury-flag',
-  adminAuth,
-  (req, res, next) => userAdminController.setTreasuryFlag(req, res, next)
-)
+router.patch('/admin/users/:id/treasury-flag', adminAuth, (req, res, next) =>
+  userAdminController.setTreasuryFlag(req, res, next)
+);
 
 /**
  * @openapi
@@ -174,11 +164,9 @@ router.patch(
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch(
-  '/admin/users/:id/provider',
-  adminAuth,
-  (req, res, next) => userAdminController.setProvider(req, res, next)
-)
+router.patch('/admin/users/:id/provider', adminAuth, (req, res, next) =>
+  userAdminController.setProvider(req, res, next)
+);
 
 /**
  * @openapi
@@ -212,10 +200,8 @@ router.patch(
  *       404:
  *         description: Usuário não encontrado
  */
-router.patch(
-  '/admin/users/:id/config',
-  adminAuth,
-  (req, res, next) => userAdminController.updateConfig(req, res, next)
-)
+router.patch('/admin/users/:id/config', adminAuth, (req, res, next) =>
+  userAdminController.updateConfig(req, res, next)
+);
 
-export default router
+export default router;

@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js'
+import { pool } from '../config/db.js';
 
 export class ProviderModel {
   static async create({ code, name, baseUrl, active }) {
@@ -10,36 +10,31 @@ export class ProviderModel {
         ($1, $2, $3, $4)
       RETURNING *;
       `,
-      [
-        code,
-        name,
-        baseUrl || null,
-        active !== undefined ? active : true
-      ]
-    )
-    return rows[0] || null
+      [code, name, baseUrl || null, active !== undefined ? active : true]
+    );
+    return rows[0] || null;
   }
 
   static async findAll({ active, search, limit, offset } = {}) {
-    const params = []
-    let where = '1=1'
+    const params = [];
+    let where = '1=1';
 
     if (active !== undefined) {
-      params.push(active)
-      where += ` AND active = $${params.length}`
+      params.push(active);
+      where += ` AND active = $${params.length}`;
     }
 
     if (search) {
-      params.push(`%${search}%`)
-      params.push(`%${search}%`)
-      where += ` AND (name ILIKE $${params.length - 1} OR code ILIKE $${params.length})`
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+      where += ` AND (name ILIKE $${params.length - 1} OR code ILIKE $${params.length})`;
     }
 
-    const limitValue = limit && Number.isFinite(Number(limit)) ? Number(limit) : 100
-    const offsetValue = offset && Number.isFinite(Number(offset)) ? Number(offset) : 0
+    const limitValue = limit && Number.isFinite(Number(limit)) ? Number(limit) : 100;
+    const offsetValue = offset && Number.isFinite(Number(offset)) ? Number(offset) : 0;
 
-    params.push(limitValue)
-    params.push(offsetValue)
+    params.push(limitValue);
+    params.push(offsetValue);
 
     const { rows } = await pool.query(
       `
@@ -51,9 +46,9 @@ export class ProviderModel {
       OFFSET $${params.length};
       `,
       params
-    )
+    );
 
-    return rows
+    return rows;
   }
 
   static async findById(id) {
@@ -65,8 +60,8 @@ export class ProviderModel {
       LIMIT 1;
       `,
       [id]
-    )
-    return rows[0] || null
+    );
+    return rows[0] || null;
   }
 
   static async findByCode(code) {
@@ -78,46 +73,46 @@ export class ProviderModel {
       LIMIT 1;
       `,
       [code]
-    )
-    return rows[0] || null
+    );
+    return rows[0] || null;
   }
 
   static async update(id, { code, name, baseUrl, active }) {
-    const updates = []
-    const params = []
-    let paramIndex = 1
+    const updates = [];
+    const params = [];
+    let paramIndex = 1;
 
     if (code !== undefined) {
-      params.push(code)
-      updates.push(`code = $${paramIndex}`)
-      paramIndex++
+      params.push(code);
+      updates.push(`code = $${paramIndex}`);
+      paramIndex++;
     }
 
     if (name !== undefined) {
-      params.push(name)
-      updates.push(`name = $${paramIndex}`)
-      paramIndex++
+      params.push(name);
+      updates.push(`name = $${paramIndex}`);
+      paramIndex++;
     }
 
     if (baseUrl !== undefined) {
-      params.push(baseUrl)
-      updates.push(`base_url = $${paramIndex}`)
-      paramIndex++
+      params.push(baseUrl);
+      updates.push(`base_url = $${paramIndex}`);
+      paramIndex++;
     }
 
     if (active !== undefined) {
-      params.push(active)
-      updates.push(`active = $${paramIndex}`)
-      paramIndex++
+      params.push(active);
+      updates.push(`active = $${paramIndex}`);
+      paramIndex++;
     }
 
     if (updates.length === 0) {
-      return await this.findById(id)
+      return await this.findById(id);
     }
-    
+
     // id vai no final
-    params.push(id)
-    const idParamIndex = paramIndex
+    params.push(id);
+    const idParamIndex = paramIndex;
 
     const { rows } = await pool.query(
       `
@@ -127,9 +122,9 @@ export class ProviderModel {
       RETURNING *;
       `,
       params
-    )
+    );
 
-    return rows[0] || null
+    return rows[0] || null;
   }
 
   static async updateStatus(id, active) {
@@ -142,8 +137,8 @@ export class ProviderModel {
       RETURNING *;
       `,
       [id, active]
-    )
-    return rows[0] || null
+    );
+    return rows[0] || null;
   }
 
   static async delete(id) {
@@ -154,23 +149,23 @@ export class ProviderModel {
       RETURNING *;
       `,
       [id]
-    )
-    return rows[0] || null
+    );
+    return rows[0] || null;
   }
 
   static async count({ active, search } = {}) {
-    const params = []
-    let where = '1=1'
+    const params = [];
+    let where = '1=1';
 
     if (active !== undefined) {
-      params.push(active)
-      where += ` AND active = $${params.length}`
+      params.push(active);
+      where += ` AND active = $${params.length}`;
     }
 
     if (search) {
-      params.push(`%${search}%`)
-      params.push(`%${search}%`)
-      where += ` AND (name ILIKE $${params.length - 1} OR code ILIKE $${params.length})`
+      params.push(`%${search}%`);
+      params.push(`%${search}%`);
+      where += ` AND (name ILIKE $${params.length - 1} OR code ILIKE $${params.length})`;
     }
 
     const { rows } = await pool.query(
@@ -180,9 +175,8 @@ export class ProviderModel {
       WHERE ${where};
       `,
       params
-    )
+    );
 
-    return Number(rows[0]?.total || 0)
+    return Number(rows[0]?.total || 0);
   }
 }
-

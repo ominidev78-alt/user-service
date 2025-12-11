@@ -1,7 +1,7 @@
-import { Router } from 'express'
-import { healthController } from '../controllers/HealthController.js'
+import { Router } from 'express';
+import { healthController } from '../controllers/HealthController.js';
 
-const router = Router()
+const router = Router();
 
 /**
  * @openapi
@@ -24,13 +24,8 @@ const router = Router()
  *             schema:
  *               $ref: '#/components/schemas/HealthResponse'
  */
-router.get('/health', (req, res, next) =>
-  healthController.health(req, res, next)
-)
+router.get('/health', (req, res, next) => healthController.health(req, res, next));
 
+router.get('/', (req, res, next) => healthController.health(req, res, next));
 
-router.get('/', (req, res, next) =>
-  healthController.health(req, res, next)
-)
-
-export default router
+export default router;

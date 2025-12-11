@@ -1,7 +1,7 @@
-import { Router } from 'express'
-import { maintenanceController } from '../controllers/MaintenanceController.js'
+import { Router } from 'express';
+import { maintenanceController } from '../controllers/MaintenanceController.js';
 
-const router = Router()
+const router = Router();
 
 /**
  * @openapi
@@ -22,9 +22,8 @@ const router = Router()
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-router.get(
-  '/public/maintenance',
-  (req, res, next) => maintenanceController.publicStatus(req, res, next)
-)
+router.get('/public/maintenance', (req, res, next) =>
+  maintenanceController.publicStatus(req, res, next)
+);
 
-export default router
+export default router;
