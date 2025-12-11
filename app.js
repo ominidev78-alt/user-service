@@ -19,7 +19,8 @@ const allowedOrigins = [
   'https://admin.ominigateway.com.br',
   'https://payg2a.online',
   'https://mutual-fintech-front-end-paas.vercel.app',
-  'https://omnigateway.site', // Added for frontend
+  'https://omnigateway.site',
+  'https://admin.omnigateway.site',
 ];
 
 app.use((req, res, next) => {
