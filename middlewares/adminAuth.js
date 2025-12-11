@@ -4,7 +4,7 @@ import { env } from '../config/env.js';
 const JWT_ADMIN_SECRET = env.JWT_ADMIN_SECRET || 'mutual-admin-secret-2025';
 
 export function adminAuth(req, res, next) {
-  const header = req.headers.authorization || '';
+  const header = req.headers.Authorization || req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 
   if (!token) {
