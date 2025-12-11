@@ -16,7 +16,7 @@ const allowedOrigins = [
   'http://api.ominigateway.com.br',
   'https://api.ominigateway.com.br',
   'https://ominigateway.com.br',
-  'https://admin.ominigateway.com.br',
+  // 'https://admin.ominigateway.com.br',
   'https://payg2a.online',
   'https://mutual-fintech-front-end-paas.vercel.app',
   'https://omnigateway.site',
