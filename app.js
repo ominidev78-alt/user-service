@@ -21,6 +21,7 @@ const allowedOrigins = [
   'https://mutual-fintech-front-end-paas.vercel.app',
   'https://omnigateway.site',
   'https://admin.omnigateway.site',
+  'https://treasury-service.omnigateway.site',
 ];
 
 app.use((req, res, next) => {
