@@ -1,7 +1,15 @@
 import { Router } from 'express';
 import { UserModel } from '../models/UserModel.js';
+import { userFeeController } from '../controllers/UserFeeController.js';
 
 const router = Router();
+
+/**
+ * @openapi
+ * tags:
+ *   name: Internal
+ *   description: Rotas internas usadas apenas pelo API Gateway / sistemas da casa.
+ */
 
 /**
  * Internal endpoint to validate app_id/app_secret credentials
@@ -59,5 +67,30 @@ router.post('/internal/validate-credentials', async (req, res) => {
     });
   }
 });
+
+/**
+ * @openapi
+ * /api/internal/users/{id}/fees:
+ *   get:
+ *     summary: Consulta tarifas Pix do usuário (rota interna)
+ *     tags: [Internal]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário
+ *     responses:
+ *       200:
+ *         description: Tarifas atuais do usuário.
+ *       400:
+ *         description: ID de usuário inválido.
+ *       500:
+ *         description: Erro interno.
+ */
+router.get('/internal/users/:id/fees', (req, res, next) =>
+  userFeeController.internalGetUserFees(req, res, next)
+);
 
 export default router;

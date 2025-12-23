@@ -1,6 +1,5 @@
-import { TwoFactorAuthModel } from '../models/TwoFactorAuthModel.js';
-import { TotpService } from '../services/TotpService.js';
 import { HttpError } from '../core/HttpError.js';
+import { authService } from '../app.js';
 
 /**
  * Middleware to require 2FA verification for protected operations
@@ -13,92 +12,68 @@ export async function require2FA(req, res, next) {
       throw new HttpError(401, 'Unauthorized');
     }
 
-    // Check if 2FA is enabled
-    const config = await TwoFactorAuthModel.findByUserId(userId);
-    if (!config || !config.enabled) {
-      throw new HttpError(403, 'TwoFactorRequired', {
-        message: '2FA é obrigatório para esta operação',
-      });
-    }
-
-    // Check if locked
-    const isLocked = await TwoFactorAuthModel.isLocked(userId);
-    if (isLocked) {
-      throw new HttpError(423, 'TwoFactorLocked', {
-        message: '2FA está temporariamente bloqueado devido a múltiplas tentativas falhas',
-      });
-    }
-
     // Get code from body
     const code = req.body.code;
     const recoveryCode = req.body.recoveryCode;
 
     if (!code && !recoveryCode) {
-      throw new HttpError(400, 'TwoFactorCodeRequired', {
-        message: 'Código 2FA é obrigatório (code ou recoveryCode)',
-      });
-    }
-
-    let isValid = false;
-
-    if (recoveryCode) {
-      isValid = await TwoFactorAuthModel.verifyRecoveryCode(userId, recoveryCode);
-    } else if (code) {
-      isValid = TotpService.verifyToken(code, config.secret);
-    }
-
-    if (!isValid) {
-      const failure = await TwoFactorAuthModel.recordFailure(userId);
-
-      const ipAddress = req.ip || req.headers['x-forwarded-for'] || null;
-      const userAgent = req.headers['user-agent'] || null;
-      const context = req.path || 'UNKNOWN';
-
-      await TwoFactorAuthModel.addAuditLog({
-        userId,
-        action: 'VERIFY_FAILED',
-        method: 'TOTP',
-        context,
-        ipAddress,
-        userAgent,
-        success: false,
-        failureReason: 'Invalid code',
-      });
-
-      if (failure.locked) {
-        throw new HttpError(423, 'TwoFactorLocked', {
-          message: 'Muitas tentativas falhas. 2FA bloqueado temporariamente.',
+      // First, check if 2FA is even enabled for this user
+      try {
+        const statusResp = await authService.get('/api/2fa/status', {
+          headers: { Authorization: req.headers.authorization }
+        });
+        
+        if (statusResp.data && statusResp.data.enabled) {
+          throw new HttpError(400, 'TwoFactorCodeRequired', {
+            message: 'Código 2FA é obrigatório (code ou recoveryCode)',
+          });
+        }
+        // If not enabled, we can proceed
+        return next();
+      } catch (err) {
+        if (err.response?.status === 401) throw new HttpError(401, 'Unauthorized');
+        if (err instanceof HttpError) throw err;
+        // If we can't check status, assume it might be required if it's a sensitive route
+        throw new HttpError(400, 'TwoFactorCodeRequired', {
+          message: 'Código 2FA é obrigatório.',
         });
       }
-
-      throw new HttpError(400, 'InvalidCode', {
-        message: 'Código 2FA inválido',
-        attemptsRemaining: 3 - failure.attempts,
-      });
     }
 
-    // Record success
-    await TwoFactorAuthModel.recordSuccess(userId);
+    // Verify code via auth-service
+    try {
+      const endpoint = recoveryCode ? '/api/2fa/verify-recovery' : '/api/2fa/verify';
+      const payload = recoveryCode ? { code: recoveryCode } : { code };
 
-    const ipAddress = req.ip || req.headers['x-forwarded-for'] || null;
-    const userAgent = req.headers['user-agent'] || null;
-    const context = req.path || 'UNKNOWN';
+      const verifyResp = await authService.post(endpoint, payload, {
+        headers: { Authorization: req.headers.authorization }
+      });
 
-    await TwoFactorAuthModel.addAuditLog({
-      userId,
-      action: 'VERIFY_SUCCESS',
-      method: 'TOTP',
-      context,
-      ipAddress,
-      userAgent,
-      success: true,
-    });
+      if (verifyResp.data && verifyResp.data.ok) {
+        // Remove code from body to prevent logging
+        delete req.body.code;
+        delete req.body.recoveryCode;
+        return next();
+      } else {
+        throw new HttpError(400, 'InvalidCode', {
+          message: 'Código 2FA inválido',
+        });
+      }
+    } catch (err) {
+      const status = err.response?.status || 500;
+      const data = err.response?.data || {};
 
-    // Remove code from body to prevent logging
-    delete req.body.code;
-    delete req.body.recoveryCode;
-
-    next();
+      if (status === 423) {
+        throw new HttpError(423, 'TwoFactorLocked', {
+          message: data.message || '2FA bloqueado temporariamente.',
+        });
+      }
+      
+      throw new HttpError(status === 401 ? 401 : 400, data.error || 'InvalidCode', {
+        message: data.message || 'Erro ao verificar código 2FA.',
+        attemptsRemaining: data.attemptsRemaining
+      });
+    }
   } catch (err) {
     return next(err);
   }
