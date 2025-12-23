@@ -390,7 +390,7 @@ export class UserModel {
 
   static generateRawCredentials() {
     const appIdRandom = crypto.randomBytes(8).toString('hex');
-    const appId = `mg_live_${appIdRandom}`;
+    const appId = `pg_live_${appIdRandom}`;
 
     const secretRandom = crypto.randomBytes(16).toString('hex');
     const clientSecret = `sk_live_${secretRandom}`;

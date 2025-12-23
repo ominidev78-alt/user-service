@@ -21,7 +21,7 @@ const WALLET_SERVICE_URL = (env.WALLET_SERVICE_URL || 'http://localhost:3002').r
 
 function generateAppCredentials() {
   const appIdRandom = crypto.randomBytes(8).toString('hex');
-  const appId = `mg_live_${appIdRandom}`;
+  const appId = `pg_live_${appIdRandom}`;
   const secretRandom = crypto.randomBytes(16).toString('hex');
   const clientSecret = `sk_live_${secretRandom}`;
   return { appId, clientSecret };

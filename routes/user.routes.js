@@ -191,7 +191,7 @@ router.post('/users/:id/credentials/rotate', (req, res, next) =>
  *       properties:
  *         appId:
  *           type: string
- *           example: mg_live_892384923849238
+ *           example: pg_live_892384923849238
  *         clientSecret:
  *           type: string
  *           example: sk_live_5f4dcc3b5aa765d61d8327deb882cf99

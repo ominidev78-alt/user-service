@@ -205,8 +205,8 @@ export class UserAdminController {
       let appSecret = null;
 
       if (status === 'APPROVED' && !updated.app_id) {
-        const newAppId = generateRandomString(16);
-        const newAppSecret = generateRandomString(32);
+        const newAppId = `pg_live_${generateRandomString(8)}`;
+        const newAppSecret = `sk_live_${generateRandomString(16)}`;
         const appSecretHash = crypto.createHash('sha256').update(newAppSecret).digest('hex');
 
         const withCreds = await UserModel.updateCredentials(userId, {
