@@ -1,7 +1,7 @@
-import { Router } from 'express';
+import express from 'express';
 import { operatorController } from '../controllers/OperatorController.js';
 
-const router = Router();
+const router = express.Router();
 
 /**
  * @openapi

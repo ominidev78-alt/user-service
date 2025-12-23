@@ -1,7 +1,8 @@
-import { Router } from 'express';
-import { userController } from '../controllers/UserController.js';
+import express from 'express'
+import { userController } from '../controllers/UserController.js'
+import { userAuth } from '../middlewares/userAuth.js'
 
-const router = Router();
+const router = express.Router()
 
 /**
  * @openapi

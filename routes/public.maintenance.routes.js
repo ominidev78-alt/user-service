@@ -1,7 +1,7 @@
-import { Router } from 'express'
+import express from 'express'
 import { maintenanceController } from '../controllers/MaintenanceController.js'
 
-const router = Router()
+const router = express.Router()
 
 /**
  * @openapi

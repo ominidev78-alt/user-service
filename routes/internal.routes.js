@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import { UserModel } from '../models/UserModel.js';
+import express from 'express';
+import { userController } from '../controllers/UserController.js'
 import { userFeeController } from '../controllers/UserFeeController.js';
 
-const router = Router();
+const router = express.Router();
 
 /**
  * @openapi
