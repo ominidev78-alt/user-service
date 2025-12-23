@@ -288,13 +288,31 @@ export async function initDb() {
   `);
 
   await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_providers_code
-    ON providers(code);
+    CREATE TABLE IF NOT EXISTS maintenance_mode (
+      id INTEGER PRIMARY KEY,
+      is_active BOOLEAN DEFAULT FALSE,
+      message TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
   `);
 
   await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_providers_active
-    ON providers(active);
+    CREATE TABLE IF NOT EXISTS beneficiaries (
+      id BIGSERIAL PRIMARY KEY,
+      user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      bank_name TEXT,
+      document TEXT,
+      pix_key TEXT NOT NULL,
+      key_type TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_beneficiaries_user_id
+    ON beneficiaries(user_id);
   `);
 
   console.log('[DB user-service] ok.');

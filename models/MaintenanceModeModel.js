@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool } from '../config/db.js'
 
 export class MaintenanceModeModel {
   static async get() {
@@ -9,7 +9,7 @@ export class MaintenanceModeModel {
       WHERE id = 1
       LIMIT 1;
       `
-    );
+    )
 
     if (!rows[0]) {
       const inserted = await pool.query(
@@ -19,11 +19,11 @@ export class MaintenanceModeModel {
         ON CONFLICT (id) DO NOTHING
         RETURNING id, is_active, message, created_at, updated_at;
         `
-      );
-      return inserted.rows[0] || { id: 1, is_active: false, message: null };
+      )
+      return inserted.rows[0] || { id: 1, is_active: false, message: null }
     }
 
-    return rows[0];
+    return rows[0]
   }
 
   static async setActive(isActive, message = null) {
@@ -38,8 +38,8 @@ export class MaintenanceModeModel {
       RETURNING id, is_active, message, created_at, updated_at;
       `,
       [Boolean(isActive), message || null]
-    );
+    )
 
-    return rows[0];
+    return rows[0]
   }
 }
