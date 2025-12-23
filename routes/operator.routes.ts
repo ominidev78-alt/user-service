@@ -1,0 +1,1 @@
+import express from 'express';import { operatorController } from '../controllers/OperatorController.js';const router = express.Router();router.post('/operators', (req, res, next) => operatorController.register(req, res, next));export default router;

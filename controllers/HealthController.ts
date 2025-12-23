@@ -1,0 +1,1 @@
+import { Request, Response } from 'express'export class HealthController {  async health(req: Request, res: Response) {    return res.json({ ok: true, service: "user-service" })  }}export const healthController = new HealthController()

@@ -1,0 +1,7 @@
+
+> user-service@1.0.0 build
+> tsc
+
+controllers/OperatorController.ts(40,24): error TS18046: 'cnpjData' is of type 'unknown'.
+controllers/OperatorController.ts(40,49): error TS18046: 'cnpjData' is of type 'unknown'.
+controllers/OperatorController.ts(41,27): error TS18046: 'cnpjData' is of type 'unknown'.
